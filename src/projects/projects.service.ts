@@ -1,9 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
+import ProjectStatusEnum from './enums/projectStatusEnum';
 
 @Injectable()
 export class ProjectsService {
@@ -21,12 +26,31 @@ export class ProjectsService {
     }
   }
 
-  findAll() {
-    return `This action returns all projects`;
+  async findAll(
+    status?: ProjectStatusEnum,
+    limit: number = 10,
+    page: number = 10,
+  ) {
+    try {
+      const query = this.projectRepository.createQueryBuilder('projects');
+      if (status) {
+        query.where('status = :x', { x: status });
+      }
+      query.skip((page - 1) * limit).take(limit);
+      return await query.getMany();
+    } catch (error) {
+      throw new BadRequestException('Error Getting Project');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+  async findOne(id: number) {
+    try {
+      const project = await this.projectRepository.findOneBy({ id });
+      if (!project) throw new NotFoundException('Project is not found');
+      return project;
+    } catch (error) {
+      throw new BadRequestException('Error Getting Project');
+    }
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {
