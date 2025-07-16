@@ -53,11 +53,27 @@ export class ProjectsService {
     }
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
+    try {
+      const project = await this.projectRepository.findOneBy({ id });
+      if (!project) throw new NotFoundException('Project not found');
+      const updateProject = await this.projectRepository.update(
+        id,
+        updateProjectDto,
+      );
+      return updateProject;
+    } catch (error) {
+      throw new BadRequestException('Error Updating Project');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} project`;
+  async remove(id: number) {
+    try {
+      const result = await this.projectRepository.delete(id);
+      if (result.affected === 0)
+        throw new NotFoundException('Project Not found');
+    } catch (error) {
+      throw new BadRequestException('Error Updating Project');
+    }
   }
 }
