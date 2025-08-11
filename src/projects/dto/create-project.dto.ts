@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import ProjectStatusEnum from '../enums/projectStatusEnum';
 
 export class CreateProjectDto {
@@ -7,5 +7,6 @@ export class CreateProjectDto {
   name: string;
 
   @IsEnum(ProjectStatusEnum, { message: 'وضعیت پروژه نامعتبر است.' })
+  @IsOptional()
   status: ProjectStatusEnum;
 }
