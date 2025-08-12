@@ -41,17 +41,39 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
+  async findOne(@Res() res: Response, @Param('id') id: string) {
+    const project = await this.projectsService.findOne(+id);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: project,
+      message: 'Project found!',
+    });
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(+id, updateProjectDto);
+  async update(
+    @Res() res: Response,
+    @Param('id') id: string,
+    @Body() updateProjectDto: UpdateProjectDto,
+  ) {
+    const updatedProject = await this.projectsService.update(
+      +id,
+      updateProjectDto,
+    );
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: updatedProject,
+      message: 'Project updated!',
+    });
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+  async remove(@Res() res: Response, @Param('id') id: string) {
+    const deletedProject = await this.projectsService.remove(+id);
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: deletedProject,
+      message: 'Project deleted!',
+    });
   }
 }
